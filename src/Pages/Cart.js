@@ -4,15 +4,12 @@ import {
     ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { Badge, Space } from 'antd';
-export const Cart = ({cartData}) => {
-
-
-    const handleWishList = () => {
-
-    }
+import { useNavigate } from 'react-router-dom';
+export const Cart = ({ cartData }) => {
+    const navigate = useNavigate()
 
     return (
-        <Space onClick={handleWishList()}>
+        <Space style={{cursor:"pointer"}} onClick={() => { navigate("/cart") }}>
             <ShoppingCartOutlined size={40} />
             wishList <Badge count={cartData.length}></Badge>
         </Space>)

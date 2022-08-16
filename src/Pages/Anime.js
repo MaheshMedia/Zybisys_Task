@@ -4,40 +4,11 @@ import axios from 'axios';
 import { useEffect, useState } from "react"
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
-
-export const Anime = () => {
-
-    const [animeData, setanimeData] = useState([]);
-    const [cartData, setCartData] = useState([])
-    const [currentPage, setCurrentPage] = useState(1)
-    const [loading, setLoading] = useState(true)
-
-    const fetchData = () => {
-        axios.get("https://api.jikan.moe/v4/anime?" + new URLSearchParams({
-            page: currentPage
-        })).then((response) => {
-            console.log(response.data.data);
-            setanimeData(response.data.data)
-            setLoading(false)
-        }).catch((error) => {
-
-            console.log(error)
-
-        })
-    }
+import { useNavigate } from 'react-router-dom';
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 
-
-    const getCartData = () => {
-        return JSON.parse(localStorage.getItem("cartData"))
-
-    }
-
-    useEffect(() => {
-        fetchData();
-        setCartData(getCartData)
-    }, [currentPage,cartData.length]);
-
+export const Anime = ({ animeData, cartData, setCartData, setanimeData, currentPage, setCurrentPage, loading }) => {
 
     const addToCart = (anime) => {
         let cartData = JSON.parse(localStorage.getItem("cartData") || "[]")
@@ -58,6 +29,7 @@ export const Anime = () => {
 
     }
 
+    let navigate = useNavigate();
 
     console.log(loading)
     return (
@@ -68,49 +40,55 @@ export const Anime = () => {
                     <Sidebar />
                 </Col>
                 <Col span={20}>
-                    <div >
-                        <Row >
+                    <Row gutter={[10, 10]}>
 
-                            {
+                        {
 
-                                !loading ? (
-                                    animeData.map((anime) => {
-                                        return <Col xl={{ span: 6 }} xs={{ span: 12 }} >
-                                            <Card className="card" onClick={() => {
+                            !loading ? (
+                                animeData.map((anime) => {
+                                    return <Col xl={{ span: 6 }} xs={{ span: 12 }} >
 
-                                            }} >
-                                                <Space direction="vertical">
-                                                    <h4>{anime.title}</h4>
-                                                    <Image height={200} src={anime.images.jpg.image_url}></Image>
+                                        <Card className="card"  >
+                                            <Space direction="vertical" style={{ width: "100%" }}>
+                                                <h4>{anime.title}</h4>
+                                                <Image onClick={() => {
+                                                    navigate(`/${anime.mal_id}`, {
+                                                        state: anime.mal_id
+                                                    })
+                                                }} height={200} src={anime.images.jpg.image_url}></Image>                                               
+                                                   <h5>{anime.rating}</h5> 
+                                        
 
-                                                    <Row align="middle">
-                                                        <Button type="primary" onClick={() => {
-                                                            addToCart(anime)
-                                                        }}>Add to Cart</Button>
+                                                <Row align="middle">
+                                                    <Button type="primary" onClick={() => {
+                                                        addToCart(anime)
+                                                    }}>Add to Cart</Button>
 
-                                                    </Row>
-                                                </Space>
+                                                </Row>
+                                            </Space>
 
-                                            </Card>
+                                        </Card>
 
-                                        </Col>
-                                    })) : (
-                                    <Spin />
-                                )
-                            }
 
-                        </Row>
+                                    </Col>
+                                })) : (
+                                <Spin />
+                            )
+                        }
 
-                        <Row>
-                            <h5 onClick={() => {
+                    </Row>
+
+                    <Row justify="center" align="middle">
+                        <Space>
+                            <Button size="large" onClick={() => {
                                 setCurrentPage(currentPage - 1)
-                            }}>prev</h5>
-                            <h5 onClick={() => {
+                            }}>Prev</Button>
+                            <Button size="large" onClick={() => {
                                 setCurrentPage(currentPage + 1)
-                            }} >Next</h5>
-                        </Row>
+                            }} >Next</Button>
+                        </Space>
 
-                    </div>
+                    </Row>
                 </Col>
             </Row>
 
